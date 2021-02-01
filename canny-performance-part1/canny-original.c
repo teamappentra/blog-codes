@@ -432,13 +432,10 @@ void magnitude_x_y(short int* delta_x,
  * NAME: Mike Heath
  * DATE: 2/15/96
  *******************************************************************************/
-void derrivative_x_y(short int* smoothedim,
-                     int rows,
-                     int cols,
-                     short int** delta_x,
-                     short int** delta_y) {
-    int r, c, pos;
-
+void derrivative_x_y1(int rows,
+                      int cols,
+                      short int** delta_x,
+                      short int** delta_y) {
     /****************************************************************************
      * Allocate images to store the derivatives.
      ****************************************************************************/
@@ -450,6 +447,14 @@ void derrivative_x_y(short int* smoothedim,
         fprintf(stderr, "Error allocating the delta_x image.\n");
         exit(1);
     }
+}
+
+void derrivative_x_y2(short int* smoothedim,
+                      int rows,
+                      int cols,
+                      short int** delta_x,
+                      short int** delta_y) {
+    int r, c, pos;
 
     /****************************************************************************
      * Compute the x-derivative. Adjust the derivative at the borders to avoid
@@ -484,32 +489,38 @@ void derrivative_x_y(short int* smoothedim,
     }
 }
 
+void derrivative_x_y(short int* smoothedim,
+                     int rows,
+                     int cols,
+                     short int** delta_x,
+                     short int** delta_y) {
+    derrivative_x_y1(rows, cols, delta_x, delta_y);
+    derrivative_x_y2(smoothedim, rows, cols, delta_x, delta_y);
+}
+
 /*******************************************************************************
  * PROCEDURE: gaussian_smooth
  * PURPOSE: Blur an image with a gaussian filter.
  * NAME: Mike Heath
  * DATE: 2/15/96
  *******************************************************************************/
-void gaussian_smooth(unsigned char* image,
-                     int rows,
-                     int cols,
-                     float sigma,
-                     short int** smoothedim) {
-    int r, c, rr, cc, /* Counter variables. */
-        windowsize,   /* Dimension of the gaussian kernel. */
-        center;       /* Half of the windowsize. */
-    float *tempim,    /* Buffer for separable filter gaussian smoothing. */
-        *kernel,      /* A one dimensional gaussian kernel. */
-        dot,          /* Dot product summing variable. */
-        sum;          /* Sum of the kernel weights variable. */
+int gaussian_smooth1(float sigma, float** kernel) {
+    int windowsize, /* Dimension of the gaussian kernel. */
+        center;     /* Half of the windowsize. */
 
     /****************************************************************************
      * Create a 1-dimensional gaussian smoothing kernel.
      ****************************************************************************/
     if (VERBOSE)
         printf("   Computing the gaussian smoothing kernel.\n");
-    make_gaussian_kernel(sigma, &kernel, &windowsize);
+    make_gaussian_kernel(sigma, kernel, &windowsize);
     center = windowsize / 2;
+
+    return center;
+}
+
+float* gaussian_smooth2(int rows, int cols, short int** smoothedim) {
+    float* tempim; /* Buffer for separable filter gaussian smoothing. */
 
     /****************************************************************************
      * Allocate a temporary buffer image and the smoothed image.
@@ -523,6 +534,20 @@ void gaussian_smooth(unsigned char* image,
         fprintf(stderr, "Error allocating the smoothed image.\n");
         exit(1);
     }
+
+    return tempim;
+}
+
+void gaussian_smooth3(unsigned char* image,
+                      int rows,
+                      int cols,
+                      short int** smoothedim,
+                      int center,
+                      float* tempim,
+                      float* kernel) {
+    int r, c, rr, cc; /* Counter variables. */
+    float dot,        /* Dot product summing variable. */
+        sum;          /* Sum of the kernel weights variable. */
 
     /****************************************************************************
      * Blur in the x - direction.
@@ -563,11 +588,24 @@ void gaussian_smooth(unsigned char* image,
                 (short int)(dot * BOOSTBLURFACTOR / sum + 0.5);
         }
     }
+}
+
+void gaussian_smooth(unsigned char* image,
+                     int rows,
+                     int cols,
+                     float sigma,
+                     short int** smoothedim) {
+    int center;    /* Half of the windowsize. */
+    float *tempim, /* Buffer for separable filter gaussian smoothing. */
+        *kernel;   /* A one dimensional gaussian kernel. */
+
+    center = gaussian_smooth1(sigma, &kernel);
+    tempim = gaussian_smooth2(rows, cols, smoothedim);
+    gaussian_smooth3(image, rows, cols, smoothedim, center, tempim, kernel);
 
     free(tempim);
     free(kernel);
 }
-
 /*******************************************************************************
  * PROCEDURE: make_gaussian_kernel
  * PURPOSE: Create a one dimensional gaussian kernel.

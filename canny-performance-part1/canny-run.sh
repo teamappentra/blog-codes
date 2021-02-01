@@ -4,7 +4,7 @@ unzip -o 15360_8640.zip
 
 
 CC=clang
-CFLAGS="-O3 -ffast-math -g -lm"
+CFLAGS="-O3 -ffast-math -g -lm -fno-omit-frame-pointer"
 
 ${CC} ${CFLAGS} canny-optimized.c -o canny-optimized
 ${CC} ${CFLAGS} canny-original.c -o canny-original
