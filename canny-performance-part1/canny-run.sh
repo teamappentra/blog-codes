@@ -10,6 +10,7 @@ ${CC} ${CFLAGS} canny-optimized.c -o canny-optimized
 ${CC} ${CFLAGS} canny-original.c -o canny-original
 
 CANNYPARAMS="testvecs/input/15360_8640.pgm 0.5 0.7 0.9"
+
 TIMECMD="/usr/bin/time -f'%E'"
 echo "Running canny-original"
 ${TIMECMD} ./canny-original ${CANNYPARAMS}
