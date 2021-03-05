@@ -285,7 +285,7 @@ void apply_hysteresis(short int *mag, unsigned char *nms, int rows, int cols,
     float tlow, float thigh, unsigned char *edge)
 {
     int r, c, pos, numedges, lowcount, highcount, lowthreshold, highthreshold,
-        i, rr, cc;
+        i, hist[32768], rr, cc;
     short int maximum_mag, sumpix;
 
     /****************************************************************************
@@ -316,7 +316,6 @@ void apply_hysteresis(short int *mag, unsigned char *nms, int rows, int cols,
     * Compute the histogram of the magnitude image. Then use the histogram to
     * compute hysteresis thresholds.
     ****************************************************************************/
-    int hist[32768];
     for (r = 0; r<32768; r++) hist[r] = 0;
 
     struct timespec start;
