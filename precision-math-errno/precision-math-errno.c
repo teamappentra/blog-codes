@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
     clock_t end = clock();
 
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("Average = %f, runtime = %f, errno = %d \n", avg, time_spent, errno);
+    printf("Average = %.17g, runtime = %f, errno = %d \n", avg, time_spent, errno);
 
     return 0;
 }
