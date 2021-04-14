@@ -6,41 +6,6 @@
 #include <string.h>
 #include <time.h>
 
-void show_fe_exceptions(void) {
-    printf("current exceptions raised: ");
-    if (fetestexcept(FE_DIVBYZERO))
-        printf(" FE_DIVBYZERO");
-    if (fetestexcept(FE_INEXACT))
-        printf(" FE_INEXACT");
-    if (fetestexcept(FE_INVALID))
-        printf(" FE_INVALID");
-    if (fetestexcept(FE_OVERFLOW))
-        printf(" FE_OVERFLOW");
-    if (fetestexcept(FE_UNDERFLOW))
-        printf(" FE_UNDERFLOW");
-    if (fetestexcept(FE_ALL_EXCEPT) == 0)
-        printf(" none");
-    printf(", errno = %s\n", strerror(errno));
-}
-
-void clear_exceptions(void) {
-    errno = 0;
-    feclearexcept(FE_ALL_EXCEPT);
-}
-
-void fenv_demo(float a) {
-    clear_exceptions();
-
-    printf("%f, 5 / a = %f\n", a, 5 / a);
-    show_fe_exceptions();
-    clear_exceptions();
-
-    printf("sqrt(%f) = %f\n", a, sqrtf(a));
-    show_fe_exceptions();
-    clear_exceptions();
-
-    return;
-}
 
 double rolling_average(double a[], int n) {
     int i;
