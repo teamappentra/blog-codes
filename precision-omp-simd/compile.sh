@@ -9,5 +9,5 @@ ${CC} ${ARGS} -fopenmp precision-omp-simd.c -o precision-omp-simd -lm
 echo "Without -fopenmp"
 ./precision-noomp-simd
 
-echo "With -fopenmo"
+echo "With OpenMP vectorization"
 ./precision-omp-simd
