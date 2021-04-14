@@ -1,6 +1,5 @@
 set -o xtrace
 
-ARGS="-g -O3 -march=core-avx2 -fno-math-errno -Rpass-missed=loop-vectorize -Rpass=loop-vectorize -Rpass-analysis=loop-vectorize"
 ARGS="-g -O3 -march=core-avx2 -fno-math-errno"
 CC=clang
 ${CC} ${ARGS} precision-omp-simd.c -o precision-noomp-simd  -lm
