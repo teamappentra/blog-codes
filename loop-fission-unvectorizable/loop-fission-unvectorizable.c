@@ -52,16 +52,10 @@ double break_loop_split(double in[], int n, double flag) {
     return sum;
 }
 
-struct result {
-    double sum;
-    int max_index;
-};
-
-struct result search_loop_naive(double in[], int n) {
+double search_loop_naive(double in[], int n, int* out_max_index) {
     int index = -1;
     double max = 0.0;
     double sum = 0.0;
-    struct result r;
 
     for (int i = 0; i < n; i++) {
         double r = calculate(in[i]);
@@ -74,16 +68,14 @@ struct result search_loop_naive(double in[], int n) {
         sum += r;
     }
 
-    r.sum = sum;
-    r.max_index = index;
-    return r;
+    *out_max_index = index;
+    return sum;
 }
 
-struct result search_loop_split(double in[], int n) {
+double search_loop_split(double in[], int n, int* out_max_index) {
     int index = -1;
     double max = 0.0;
     double sum = 0.0;
-    struct result r;
 
     double* tmp = malloc(sizeof(double) * n);
 
@@ -103,9 +95,8 @@ struct result search_loop_split(double in[], int n) {
 
     free(tmp);
 
-    r.sum = sum;
-    r.max_index = index;
-    return r;
+    *out_max_index = index;
+    return sum;
 }
 
 
@@ -124,7 +115,7 @@ double out_array[ARR_LEN];
 int main(int argc, char** argv) {
     clock_t begin, end;
     double res, time_spent;
-    struct result r;
+    int max_index;
     
     fill_array(my_array, ARR_LEN);
 
@@ -145,18 +136,18 @@ int main(int argc, char** argv) {
 
 
     begin = clock();
-    r = search_loop_naive(my_array, ARR_LEN);
+    res = search_loop_naive(my_array, ARR_LEN, &max_index);
     end = clock();
 
     time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("SEARCH LOOP NAIVE: Result = %.17g, max_index = %d , runtime = %f\n", r.sum, r.max_index, time_spent);
+    printf("SEARCH LOOP NAIVE: Result = %.17g, max_index = %d , runtime = %f\n", res, max_index, time_spent);
 
     begin = clock();
-    r = search_loop_split(my_array, ARR_LEN);
+    res = search_loop_split(my_array, ARR_LEN, &max_index);
     end = clock();
 
     time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("SEARCH LOOP SPLIT: Result = %.17g, max_index = %d , runtime = %f\n", r.sum, r.max_index, time_spent);
+    printf("SEARCH LOOP SPLIT: Result = %.17g, max_index = %d , runtime = %f\n", res, max_index, time_spent);
 
 
     return 0;
