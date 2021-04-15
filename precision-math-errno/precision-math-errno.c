@@ -11,7 +11,6 @@ double rolling_average(double a[], int n) {
     int i;
     double result = 0.0;
 
-    #pragma omp simd reduction(+:result)
     for (i = 0; i < n; i++) {
         result += sqrt(a[i]) / n;
     }
