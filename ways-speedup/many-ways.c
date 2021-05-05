@@ -195,6 +195,79 @@ void print_matrix(int m[][LARGE_MATRIX_DIM]) {
     }
 }
 
+void fill_array_double(double a[], int n) {
+    int i;
+
+    for (i = 0; i < n; i++) {
+        a[i] = (double)rand();
+    }
+}
+
+double rolling_average(double a[], int n) {
+    int i;
+    double result = 0.0;
+
+    clock_t begin = clock(), end;
+    double time_spent;
+
+    for (i = 0; i < n; i++) {
+        result += sqrt(a[i]) / n;
+    }
+
+    end = clock();
+    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("%s: Result = %f, runtime = %f\n", __FUNCTION__, result, time_spent);
+
+    return result;
+}
+
+double rolling_average_multi(double a[], int n) {
+    int i;
+    double result = 0.0;
+
+    clock_t begin = clock(), end;
+    double time_spent;
+
+#pragma omp parallel default(none) shared(a, n, result) private(i)
+    {
+#pragma omp for reduction(+ : result) schedule(auto)
+        for (i = 0; i < n; i++) {
+            result += sqrt(a[i]) / n;
+        }
+    }  // end parallel
+
+    end = clock();
+    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("%s: Result = %f, runtime = %f\n", __FUNCTION__, result, time_spent);
+
+    return result;
+}
+
+double rolling_average_offload(double a[], int n) {
+    int i;
+    double result = 0.0;
+
+    clock_t begin = clock(), end;
+    double time_spent;
+
+#pragma acc data copyin(a [0:n], n) copy(result)
+    {
+#pragma acc parallel
+        {
+#pragma acc loop reduction(+ : result)
+            for (i = 0; i < n; i++) {
+                result += sqrt(a[i]) / n;
+            }
+        }  // end parallel
+    }      // end data
+
+    end = clock();
+    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("%s: Result = %f, runtime = %f\n", __FUNCTION__, result, time_spent);
+
+    return result;
+}
+
 #define ARR_LEN (100 * 1024 * 1024)
 #define HIST_LEN (32768)
 
@@ -229,20 +302,29 @@ int main(int argc, char** argv) {
     memset(hist_arr2, 0, sizeof(hist_arr2));
     calculate_hysteresis_branchless(in_arr, out_arr, ARR_LEN, hist_arr2);
 
-    fill_matrix_regular(in_mat1);
-    fill_matrix_regular(in_mat2);
+    // fill_matrix_regular(in_mat1);
+    // fill_matrix_regular(in_mat2);
 
-    multiply_matrices(out_mat1, in_mat1, in_mat2);
-    multiply_matrices_interchanged(out_mat2, in_mat1, in_mat2);
+    // multiply_matrices(out_mat1, in_mat1, in_mat2);
+    // multiply_matrices_interchanged(out_mat2, in_mat1, in_mat2);
 
-    compare_matrices_regular(out_mat1, out_mat2);
+    // compare_matrices_regular(out_mat1, out_mat2);
 
-    fill_matrix_large(in_large_mat1);
+    // fill_matrix_large(in_large_mat1);
 
-    matrix_transpose(out_large_mat1, in_large_mat1);
-    matrix_transpose_tiled(out_large_mat2, in_large_mat1);
+    // matrix_transpose(out_large_mat1, in_large_mat1);
+    // matrix_transpose_tiled(out_large_mat2, in_large_mat1);
 
-    compare_matrices_large(out_large_mat1, out_large_mat2);
+    // compare_matrices_large(out_large_mat1, out_large_mat2);
+
+    double* in_arr_double = malloc(ARR_LEN * sizeof(double));
+
+    fill_array_double(in_arr_double, ARR_LEN);
+    rolling_average(in_arr_double, ARR_LEN);
+    rolling_average_multi(in_arr_double, ARR_LEN);
+    rolling_average_offload(in_arr_double, ARR_LEN);
+
+    free(in_arr_double);
 
     return 0;
 }
