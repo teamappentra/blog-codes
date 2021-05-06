@@ -4,6 +4,18 @@
 #include <string.h>
 #include <time.h>
 
+double get_runtime(struct timespec start) {
+    struct timespec finish;
+    double seconds;
+
+    clock_gettime(CLOCK_MONOTONIC, &finish);
+
+    seconds = (finish.tv_sec - start.tv_sec);
+    seconds += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+
+    return seconds;
+}
+
 void fill_array(int a[], int n) {
     int i;
 
@@ -11,17 +23,6 @@ void fill_array(int a[], int n) {
         a[i] = (int)rand();
         if (a[i] % 2 == 0) {
             a[i] = -a[i];
-        }
-    }
-}
-
-void normalize_array_to_80_percent_positive(int a[], int n) {
-    for (int i = 0; i < n; i++) {
-        int val = rand() % 5;
-        if (val == 0) {
-            a[i] = -abs(a[i]);
-        } else {
-            a[i] = abs(a[i]);
         }
     }
 }
@@ -207,15 +208,15 @@ double rolling_average(double a[], int n) {
     int i;
     double result = 0.0;
 
-    clock_t begin = clock(), end;
     double time_spent;
+    struct timespec start;
+    clock_gettime(CLOCK_MONOTONIC, &start);
 
     for (i = 0; i < n; i++) {
         result += sqrt(a[i]) / n;
     }
 
-    end = clock();
-    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    time_spent = get_runtime(start);
     printf("%s: Result = %f, runtime = %f\n", __FUNCTION__, result, time_spent);
 
     return result;
@@ -225,8 +226,9 @@ double rolling_average_multi(double a[], int n) {
     int i;
     double result = 0.0;
 
-    clock_t begin = clock(), end;
     double time_spent;
+    struct timespec start;
+    clock_gettime(CLOCK_MONOTONIC, &start);
 
 #pragma omp parallel default(none) shared(a, n, result) private(i)
     {
@@ -236,33 +238,7 @@ double rolling_average_multi(double a[], int n) {
         }
     }  // end parallel
 
-    end = clock();
-    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("%s: Result = %f, runtime = %f\n", __FUNCTION__, result, time_spent);
-
-    return result;
-}
-
-double rolling_average_offload(double a[], int n) {
-    int i;
-    double result = 0.0;
-
-    clock_t begin = clock(), end;
-    double time_spent;
-
-#pragma acc data copyin(a [0:n], n) copy(result)
-    {
-#pragma acc parallel
-        {
-#pragma acc loop reduction(+ : result)
-            for (i = 0; i < n; i++) {
-                result += sqrt(a[i]) / n;
-            }
-        }  // end parallel
-    }      // end data
-
-    end = clock();
-    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    time_spent = get_runtime(start);
     printf("%s: Result = %f, runtime = %f\n", __FUNCTION__, result, time_spent);
 
     return result;
@@ -302,27 +278,26 @@ int main(int argc, char** argv) {
     memset(hist_arr2, 0, sizeof(hist_arr2));
     calculate_hysteresis_branchless(in_arr, out_arr, ARR_LEN, hist_arr2);
 
-    // fill_matrix_regular(in_mat1);
-    // fill_matrix_regular(in_mat2);
+    fill_matrix_regular(in_mat1);
+    fill_matrix_regular(in_mat2);
 
-    // multiply_matrices(out_mat1, in_mat1, in_mat2);
-    // multiply_matrices_interchanged(out_mat2, in_mat1, in_mat2);
+    multiply_matrices(out_mat1, in_mat1, in_mat2);
+    multiply_matrices_interchanged(out_mat2, in_mat1, in_mat2);
 
-    // compare_matrices_regular(out_mat1, out_mat2);
+    compare_matrices_regular(out_mat1, out_mat2);
 
-    // fill_matrix_large(in_large_mat1);
+    fill_matrix_large(in_large_mat1);
 
-    // matrix_transpose(out_large_mat1, in_large_mat1);
-    // matrix_transpose_tiled(out_large_mat2, in_large_mat1);
+    matrix_transpose(out_large_mat1, in_large_mat1);
+    matrix_transpose_tiled(out_large_mat2, in_large_mat1);
 
-    // compare_matrices_large(out_large_mat1, out_large_mat2);
+    compare_matrices_large(out_large_mat1, out_large_mat2);
 
     double* in_arr_double = malloc(ARR_LEN * sizeof(double));
 
     fill_array_double(in_arr_double, ARR_LEN);
     rolling_average(in_arr_double, ARR_LEN);
     rolling_average_multi(in_arr_double, ARR_LEN);
-    rolling_average_offload(in_arr_double, ARR_LEN);
 
     free(in_arr_double);
 
