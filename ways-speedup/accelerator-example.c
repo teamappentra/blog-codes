@@ -1,18 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
-
-double get_runtime(struct timespec start) {
-    struct timespec finish;
-    double seconds;
-
-    clock_gettime(CLOCK_MONOTONIC, &finish);
-
-    seconds = (finish.tv_sec - start.tv_sec);
-    seconds += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
-
-    return seconds;
-}
+#include "utils.h"
 
 double calculate_pi(int N) {
     double time_spent;
