@@ -1,3 +1,5 @@
+#include <stdbool.h>
+#include <stdio.h>
 #include "utils.h"
 
 int calculate_sum(int* a, int n, bool only_positives) {
