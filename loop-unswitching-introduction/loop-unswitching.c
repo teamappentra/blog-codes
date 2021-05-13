@@ -49,6 +49,7 @@ int calculate_sum_unswitched_manually(int* a, int n, bool only_positives) {
     return sum;
 }
 
+/** Pointer aliasing example */
 #define MAX_SETTINGS_COUNT 100
 #define ONLY_POSITIVES 21
 
