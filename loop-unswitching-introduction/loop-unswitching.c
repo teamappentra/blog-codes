@@ -169,7 +169,6 @@ int main(int argc, char** argv) {
         calculate_sum(data, ARR_LEN, arr[i]);
         calculate_sum_unswitched_manually(data, ARR_LEN, arr[i]);
         calculate_sum_call_other(data, ARR_LEN);
-        calculate_sum_force(data, ARR_LEN, arr[i]);
         increment_array(data, ARR_LEN);
     }
 
