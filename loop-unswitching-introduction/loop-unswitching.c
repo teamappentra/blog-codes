@@ -73,6 +73,7 @@ void increment_array(int* a, int n) {
            get_runtime(start));
 }
 
+/* Function call making the loop condition not invariant example */
 bool only_positives = false;
 
 int calculate(int a) {
