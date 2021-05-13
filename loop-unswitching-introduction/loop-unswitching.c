@@ -105,54 +105,6 @@ int calculate_sum_call_other(int* a, int n) {
     return sum;
 }
 
-#define CALCULATE_SUM(only_positives)                                  \
-    int calculate_sum_only_positives_##only_positives(int* a, int n) { \
-        int sum = 0;                                                   \
-        for (int i = 0; i < n; i++) {                                  \
-            if (only_positives) {                                      \
-                if (a[i] > 0) {                                        \
-                    sum += a[i];                                       \
-                }                                                      \
-            } else {                                                   \
-                sum += a[i];                                           \
-            }                                                          \
-        }                                                              \
-                                                                       \
-        return sum;                                                    \
-    }
-
-CALCULATE_SUM(true)
-CALCULATE_SUM(false)
-
-int calculate_sum_force(int* a, int n, bool only_positives) {
-    int sum = 0;
-    struct timespec start;
-    clock_gettime(CLOCK_MONOTONIC, &start);
-
-#define BODY(only_positives)      \
-    for (int i = 0; i < n; i++) { \
-        if (only_positives) {     \
-            if (a[i] > 0) {       \
-                sum += a[i];      \
-            }                     \
-        } else {                  \
-            sum += a[i];          \
-        }                         \
-    }
-
-    if (only_positives) {
-        BODY(true);
-    } else {
-        BODY(false);
-    }
-
-    printf("%s: Result = %d, runtime = %f\n", __FUNCTION__, sum,
-           get_runtime(start));
-
-#undef BODY
-    return sum;
-}
-
 #define ARR_LEN (200 * 1024 * 1024)
 
 int data[ARR_LEN];
