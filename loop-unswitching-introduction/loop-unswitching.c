@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "utils.h"
 
+/* Manual loop unswitching example */
 int calculate_sum(int* a, int n, bool only_positives) {
     int sum = 0;
 
