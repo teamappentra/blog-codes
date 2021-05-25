@@ -15,14 +15,6 @@ double get_runtime(struct timespec start) {
     return seconds;
 }
 
-static void fill_int_array(int* a, int n) {
-    for (int i = 0; i < n; i++) {
-        a[i] = rand() - 10000;
-    }
-}
-
-
-
 void fill_array_double(double a[], int n) {
     int i;
 
@@ -30,7 +22,6 @@ void fill_array_double(double a[], int n) {
         a[i] = (double)rand();
     }
 }
-
 
 void fill_array_float(float a[], int n) {
     int i;
