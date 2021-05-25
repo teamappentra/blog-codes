@@ -16,7 +16,7 @@ double rolling_average(double a[], int n) {
         result += sqrt(a[i]) / n;
     }
 
-    printf("%s: Result = %f, runtime = %f\n", __FUNCTION__, result,
+    printf("%s: Result = %.17g, runtime = %f\n", __FUNCTION__, result,
            get_runtime(start));
 
     return result;
@@ -35,7 +35,7 @@ double rolling_average_recip(double a[], int n) {
         result += sqrt(a[i]) * n_recip;
     }
 
-    printf("%s: Result = %f, runtime = %f\n", __FUNCTION__, result,
+    printf("%s: Result = %.17g, runtime = %f\n", __FUNCTION__, result,
            get_runtime(start));
 
     return result;
@@ -51,7 +51,7 @@ void division(float a[], float b[], float c[], int n) {
         c[i] = a[i] / b[i];
     }
 
-    printf("%s: Result = %f, runtime = %f\n", __FUNCTION__, c[0],
+    printf("%s: Result = %.17g, runtime = %f\n", __FUNCTION__, c[0],
            get_runtime(start));
 }
 
@@ -77,7 +77,7 @@ void division_approximate(float a[], float b[], float c[], int n) {
         c[i] = a[i] / b[i];
     }
 
-    printf("%s: Result = %f, runtime = %f\n", __FUNCTION__, c[0],
+    printf("%s: Result = %.17g, runtime = %f\n", __FUNCTION__, c[0],
            get_runtime(start));
 }
 
